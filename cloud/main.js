@@ -8,7 +8,9 @@ Parse.Cloud.define("corrigirApiario", function(request, response) {
 	query.find({
 		success: function(results) {
 		  for (var i = 0; i < results.length; ++i) {
+			console.log("i " + i);
 			var apicultor = results[i].get("apicultor");
+			console.log("ap " + apicultor);
 			results[i].set("associacao", apicultor.get("associacao"));
 		  }
 		  response.success("deu certo ?!");
