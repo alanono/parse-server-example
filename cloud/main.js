@@ -2,6 +2,24 @@ Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world2!");
 });
 
+Parse.Cloud.define("corrigirApiario", function(request, response) {
+	var Apiario = Parse.Object.extend("Apiario");
+	var query = new Parse.Query(Apiario);
+	query.find({
+		success: function(results) {
+		  for (var i = 0; i < results.length; ++i) {
+			var apicultor = results[i].get("apicultor");
+			results[i].set("associacao", apicultor.get("associacao"));
+		  }
+		  response.success("deu certo ?!");
+		},
+		error: function() {
+		  response.error(" failed");
+		}
+	});
+  response.success("Hello world2!");
+});
+
 Parse.Cloud.beforeSave("Associacao", function(request, response) {
 	
   if (request.object.get("numeroSif") != undefined) {
