@@ -2,6 +2,7 @@ Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world2!");
 });
 
+/*
 Parse.Cloud.define("corrigirApiario", function(request, response) {
 	//var Apiario = Parse.Object.extend("Apiario");
 	console.log("aqui ");
@@ -115,3 +116,5 @@ Parse.Cloud.beforeSave("Apiario", function(request, response) {
 	  response.success();
   }
 });  
+
+*/
