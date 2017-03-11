@@ -17,7 +17,7 @@ Parse.Cloud.define("corrigirApiario", function(request, response) {
 		  response.error(" failed");
 		}
 	});
-  response.success("Hello world2!");
+  
 });
 
 Parse.Cloud.beforeSave("Associacao", function(request, response) {
