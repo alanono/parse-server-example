@@ -3,8 +3,10 @@ Parse.Cloud.define("hello", function(request, response) {
 });
 
 Parse.Cloud.define("corrigirApiario", function(request, response) {
-	var Apiario = Parse.Object.extend("Apiario");
-	var query = new Parse.Query(Apiario);
+	//var Apiario = Parse.Object.extend("Apiario");
+	console.log("aqui ");
+	var query = new Parse.Query("Apiario");
+	console.log("aqui 2");
 	query.find({
 		success: function(results) {
 		  for (var i = 0; i < results.length; ++i) {
@@ -19,6 +21,7 @@ Parse.Cloud.define("corrigirApiario", function(request, response) {
 		  response.error(" failed");
 		}
 	});
+	console.log("aqui 3");
   
 });
 
