@@ -199,6 +199,7 @@ Parse.Cloud.define("updateUserPass", function(request, response) {
    query.first({ useMasterKey: true }).then(function(object) {
         object.set("username", request.params.username);
         object.set("password", request.params.password);
+		obj.save();
 		response.success(object);
       }, function(error) {
         response.error(error);
