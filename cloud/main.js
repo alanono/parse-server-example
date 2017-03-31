@@ -4,7 +4,7 @@ Parse.Cloud.define("hello", function(request, response) {
 
 Parse.Cloud.define("updateUserPass", function(request, response) {
   Parse.Cloud.useMasterKey();
-  var query = new Parse.Query("_User");
+  var query = new Parse.Query(Parse.User);
   query.equalTo("objectId", request.params.objectId);
   query.find({
     success: function(results) {
@@ -19,7 +19,7 @@ Parse.Cloud.define("updateUserPass", function(request, response) {
     },
     error: function() {
 		console.log('erro query');
-      response.error("Erro");
+      response.error("meu Erro");
     }
   });
 });
