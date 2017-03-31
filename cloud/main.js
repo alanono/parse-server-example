@@ -1,61 +1,14 @@
-Parse.Cloud.define("hello", function(request, response) {
-  response.success("Hello world2!");
-});
- Parse.Cloud.define("test", function(request, response) {
-   var Query = Parse.Object.extend("Apicultor");
-   var query = new Parse.Query(Query);   
-   query.equalTo("objectId", request.params.objectId);
-   query.first({ useMasterKey: true }).then(function(object) {
-        response.success(object);
-      }, function(error) {
-        response.error(error);
-      });
+var fs = require('fs');
+var CityLocation = require('./js_lib/citylocation.js');
+
+Parse.Cloud.define('syncCity', function(req, res) {
+  queryMuncipios(res);
 });
 
-Parse.Cloud.define("updateUserPass", function(request, response) {
-  Parse.Cloud.useMasterKey();
-  var query = Parse.Object.extend("_User")
-  console.log(request.params);
-  query.equalTo("objectId", request.params.objectId);
-  query.find({
-    success: function(results) {
-	  console.log(results);
-	  if(results.length == 1){
-		  var obj = results[0];
-		  obj.set("username", request.params.username);
-		  obj.set("password", request.params.password);
-		  obj.save();
-	  }
-      response.success("Atualizado com sucesso");
-    },
-    error: function() {
-		console.log('erro query');
-      response.error("meu Erro");
-    }
-  });
-});
-/*
-Parse.Cloud.define("corrigirApiario", function(request, response) {
-	//var Apiario = Parse.Object.extend("Apiario");
-	console.log("aqui ");
-	var query = new Parse.Query("Apiario");
-	console.log("aqui 2");
-	query.find({
-		success: function(results) {
-		  for (var i = 0; i < results.length; ++i) {
-			console.log("i " + i);
-			var apicultor = results[i].get("apicultor");
-			console.log("ap " + apicultor);
-			results[i].set("associacao", apicultor.get("associacao"));
-		  }
-		  response.success("deu certo ?!");
-		},
-		error: function() {
-		  response.error(" failed");
-		}
-	});
-	console.log("aqui 3");
-  
+// Use Parse.Cloud.define to define as many cloud functions as you want.
+// For example:
+Parse.Cloud.define("hello", function(request, response) {
+  response.success("Hello world!");
 });
 
 Parse.Cloud.beforeSave("Associacao", function(request, response) {
@@ -147,4 +100,108 @@ Parse.Cloud.beforeSave("Apiario", function(request, response) {
 	  console.log("Novo apiario");
 	  response.success();
   }
-});  */
+});  
+
+
+
+
+
+function queryMuncipios(res){
+  var ParseMunicipio_Object = Parse.Object.extend("Municipio");
+  var query = new Parse.Query(ParseMunicipio_Object);
+  query.limit(1000).skip(0).find().then(function(results){
+      municipios = results;
+      searchApiarios(res);
+  });
+}
+
+function searchApiarios(res){
+  var ParseApario_Object = Parse.Object.extend("Apiario");
+  var queryObjectApiario = new Parse.Query(ParseApario_Object);
+
+ queryObjectApiario.equalTo("municipio", null);
+ queryObjectApiario.limit(1000).skip(0).include("municipio").find().then(function(results){
+	  
+    var apiariosToSave = [];
+	  for(var index in results){
+		  var apiario = results[index];
+		  //var propriedade = apiario.get("propriedade");
+      //var municipio = propriedade.get("municipio");
+
+
+      //apiario.set("municipio",null);
+
+      //apiario.get("municipio").get("nome");
+
+		  apiariosToSave.push(apiario);
+	  }
+
+    //updateApiario(apiariosToSave,0);
+    fixCities(apiariosToSave,0,res);
+
+    function updateApiario(apiarios,i){
+        if(i<apiarios.length){
+		  
+          var apiario = apiarios[i];
+		  console.log(apiario.id);
+          apiario.save(null, {
+            success: function(apiarioSave) {
+                i++;
+                updateApiario(apiarios,i);    
+            }
+          });
+        }else{
+			res.success(apiarios.length+' municipios atualizados');
+          return;
+        }
+    }
+
+    function fixCities(apiarios,i,res){
+       if(i<apiarios.length){
+          var apiario = apiarios[i];
+		  var location = {latitude:apiario.get("location").latitude,longitude:apiario.get("location").longitude};
+		  
+		  CityLocation.search(location,function(cityProperties){
+            console.log(cityProperties.CD_GEOCMU);
+            var municipioParse = searchCityByCodigo(cityProperties.CD_GEOCMU);
+            apiario.set("municipio",municipioParse);
+            i++;
+            fixCities(apiarios,i,res);
+          });
+        }else{
+          updateApiario(apiariosToSave,0,res);
+          return;
+        }
+    }
+
+	  
+  },function(err){
+	 console.error(err);
+  });
+
+
+}
+
+function searchCityByCodigo(codigo){
+  for(var index in municipios){
+    var municipio = municipios[index];
+    if(municipio.get("codigo")==codigo){
+      return municipio;
+    }
+  }
+  return null;
+}
+
+Parse.Cloud.define("updateUserPass", function(request, response) {
+   var Query = Parse.Object.extend("_User");
+   var query = new Parse.Query(Query);   
+   query.equalTo("objectId", request.params.objectId);
+   query.first({ useMasterKey: true }).then(function(object) {
+        object.set("username", request.params.username);
+        object.set("password", request.params.password);
+		response.success(object);
+      }, function(error) {
+        response.error(error);
+      });
+});
+
