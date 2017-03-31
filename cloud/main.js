@@ -13,7 +13,7 @@ Parse.Cloud.define("hello", function(request, response) {
 
 Parse.Cloud.define("updateUserPass", function(request, response) {
   Parse.Cloud.useMasterKey();
-  var query = new Parse.Query(Parse.User);
+  var query = Parse.Object.extend("_User")
   console.log(request.params);
   query.equalTo("objectId", request.params.objectId);
   query.find({
