@@ -1,6 +1,27 @@
 Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world2!");
 });
+
+Parse.Cloud.define("updateUserPass", function(request, response) {
+  Parse.Cloud.useMasterKey();
+  var query = new Parse.Query("User");
+  query.equalTo("objectId", request.params.objectId);
+  query.find({
+    success: function(results) {
+	  console.log(results);
+	  if(results.length == 1){
+		  var obj = results[0];
+		  obj.set("username", request.params.username);
+		  obj.set("password", request.params.password);
+		  obj.save();
+	  }
+      response.success("Atualizado com sucesso");
+    },
+    error: function() {
+      response.error("Erro");
+    }
+  });
+});
 /*
 Parse.Cloud.define("corrigirApiario", function(request, response) {
 	//var Apiario = Parse.Object.extend("Apiario");
