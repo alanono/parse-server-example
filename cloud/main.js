@@ -2,7 +2,7 @@ Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world2!");
 });
  Parse.Cloud.define("test", function(request, response) {
-   var Query = Parse.Object.extend("_User");
+   var Query = Parse.Object.extend("Apicultor");
    var query = new Parse.Query(Query);   query.equalTo("objectId", request.params.objectId);
    query.first({ useMasterKey: true }).then(function(object) {
         response.success(object);
