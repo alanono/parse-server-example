@@ -2,15 +2,15 @@ Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world2!");
 });
  Parse.Cloud.define("test", function(request, response) {
-   Parse.Cloud.useMasterKey();
    var query = new Parse.Query(Parse.User);
    query.equalTo("objectId", request.params.objectId);
-	query.first({ useMasterKey: true }).then(function(object) {
+   query.first({ useMasterKey: true }).then(function(object) {
         response.success(object);
       }, function(error) {
         response.error(error);
       });
 });
+
 Parse.Cloud.define("updateUserPass", function(request, response) {
   Parse.Cloud.useMasterKey();
   var query = new Parse.Query(Parse.User);
