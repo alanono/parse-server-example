@@ -2,7 +2,7 @@
 //var CityLocation = require('./js_lib/citylocation.js');
 
 Parse.Cloud.define('syncCity', function(req, res) {
-  queryMuncipios(res);
+  response.success("Hello world!");
 });
 
 // Use Parse.Cloud.define to define as many cloud functions as you want.
@@ -199,7 +199,8 @@ Parse.Cloud.define("updateUserPass", function(request, response) {
    query.first({ useMasterKey: true }).then(function(object) {
         console.log(object);
 		object.set("username", request.params.username);
-        object.set("password", request.params.password);
+        if(request.params.password)
+			object.set("password", request.params.password);
 		object.save(null,{
           useMasterKey: true,
           success: function(note){
