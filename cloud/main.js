@@ -197,9 +197,18 @@ Parse.Cloud.define("updateUserPass", function(request, response) {
    var query = new Parse.Query(Query);   
    query.equalTo("objectId", request.params.objectId);
    query.first({ useMasterKey: true }).then(function(object) {
-        object.set("username", request.params.username);
+        console.log(object);
+		object.set("username", request.params.username);
         object.set("password", request.params.password);
-		obj.save();
+		object.save(null,{
+          //do not use master key?
+          success: function(note){
+            //u should wait the non-blocking call success and finish
+            console.log("Cloud Code: User note rating has increased by 1.", object);
+            response.success('Cloud Code: User note rating has increased by 1.');
+          }, error: response.error
+        });
+		
 		response.success(object);
       }, function(error) {
         response.error(error);
