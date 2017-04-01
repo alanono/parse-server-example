@@ -204,8 +204,8 @@ Parse.Cloud.define("updateUserPass", function(request, response) {
           useMasterKey: true,
           success: function(note){
             //u should wait the non-blocking call success and finish
-            console.log("Cloud Code: User note rating has increased by 1.", object);
-            response.success('Cloud Code: User note rating has increased by 1.');
+            console.log("usuario atualizado ", object);
+            response.success('Cloud Code: Usuario atualizado');
           }, error: response.error
         });
 		
