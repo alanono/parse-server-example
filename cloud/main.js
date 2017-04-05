@@ -13,7 +13,7 @@ Parse.Cloud.define("hello", function(request, response) {
 
 Parse.Cloud.beforeSave("Associacao", function(request, response) {
 	
-  if (request.object.get("numeroSif") != undefined) {
+  if (request.object.get("numeroSif") != undefined && request.object.get("objectId") != undefined) {
 	var numeroSif  =  request.object.get("numeroSif");
 	var objectId = request.object.id;
 	
@@ -37,6 +37,8 @@ Parse.Cloud.beforeSave("Associacao", function(request, response) {
 		response.error("Objeto nao encontrado");
 	  }
 	});
+  } else {
+	  response.success();
   }
 });
 
