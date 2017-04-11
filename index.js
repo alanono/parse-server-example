@@ -23,7 +23,7 @@ var api = new ParseServer({
   push: {
     fcm: {
       senderId: '758094525244',
-      apiKey: 'AIzaSyBVJ_5wZuc7wDAHkmpJjnruAt1EaEY8Loo'
+      apiKey: 'AAAAsIH0czw:APA91bFgdMWlDXf32-122VTU5MJKenR4Y6xjbZBBNEdtF7KF9rW_Xlszg2F0ZCzsvWZ2zzgbdUi1OfCUEc-7ygUDLtKECKFtG86mUsGEpmKtRQDpjqavsinCXW68FadV_pwP3oHvlyO3'
     }
   }
 });
