@@ -21,7 +21,7 @@ var api = new ParseServer({
     classNames: ["Posts", "Comments"] // List of classes to support for query subscriptions
   },
   push: {
-    fcm: {
+    android: {
       senderId: '758094525244',
       apiKey: 'AAAAsIH0czw:APA91bFgdMWlDXf32-122VTU5MJKenR4Y6xjbZBBNEdtF7KF9rW_Xlszg2F0ZCzsvWZ2zzgbdUi1OfCUEc-7ygUDLtKECKFtG86mUsGEpmKtRQDpjqavsinCXW68FadV_pwP3oHvlyO3'
     }
