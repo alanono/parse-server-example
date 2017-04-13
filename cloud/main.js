@@ -194,6 +194,7 @@ function searchCityByCodigo(codigo){
   return null;
 }
 
+/*Foi alterada para updateUser, sera mantida temporariamente por motivos de compatibilidade*/
 Parse.Cloud.define("updateUserPass", function(request, response) {
    var Query = Parse.Object.extend("_User");
    var query = new Parse.Query(Query);   
@@ -203,6 +204,32 @@ Parse.Cloud.define("updateUserPass", function(request, response) {
 		object.set("username", request.params.username);
         if(request.params.password)
 			object.set("password", request.params.password);
+		object.save(null,{
+          useMasterKey: true,
+          success: function(note){
+            //u should wait the non-blocking call success and finish
+            console.log("usuario atualizado ", object);
+            response.success('Cloud Code: Usuario atualizado');
+          }, error: response.error
+        });
+		
+		response.success(object);
+      }, function(error) {
+        response.error(error);
+      });
+});
+
+Parse.Cloud.define("updateUser", function(request, response) {
+   var Query = Parse.Object.extend("_User");
+   var query = new Parse.Query(Query);   
+   query.equalTo("objectId", request.params.objectId);
+   query.first({ useMasterKey: true }).then(function(object) {
+        console.log(object);
+		object.set("username", request.params.username);
+        if(request.params.password)
+			object.set("password", request.params.password);
+        if(request.params.email)
+			object.set("email", request.params.email);
 		object.save(null,{
           useMasterKey: true,
           success: function(note){
