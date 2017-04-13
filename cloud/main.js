@@ -218,3 +218,14 @@ Parse.Cloud.define("updateUserPass", function(request, response) {
       });
 });
 
+Parse.Cloud.define("listUsers", function(request, response) {
+   var Query = Parse.Object.extend("_User");
+   var query = new Parse.Query(Query);   
+   query.find({ useMasterKey: true }).then(function(objects) {
+        console.log(objects);
+		response.success(objects);
+      }, function(error) {
+        response.error(error);
+      });
+});
+
