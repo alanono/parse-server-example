@@ -259,7 +259,7 @@ Parse.Cloud.define("listUsers", function(request, response) {
         response.error(error);
       });
 });
-
+/*
 Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
   console.log("inicio atualizaCaixasPontos");
   var Apiario = Parse.Object.extend("Apiario");
@@ -285,3 +285,4 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
   });
 
 });  
+*/
