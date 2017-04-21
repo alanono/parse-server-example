@@ -225,11 +225,14 @@ Parse.Cloud.define("updateUser", function(request, response) {
    query.equalTo("objectId", request.params.objectId);
    query.first({ useMasterKey: true }).then(function(object) {
         console.log(object);
-		object.set("username", request.params.username);
+        if(request.params.username)
+			object.set("username", request.params.username);
         if(request.params.password)
 			object.set("password", request.params.password);
         if(request.params.email)
 			object.set("email", request.params.email);
+        if(request.params.tipo)
+			object.set("tipo", request.params.tipo);
 		object.save(null,{
           useMasterKey: true,
           success: function(note){
@@ -257,3 +260,28 @@ Parse.Cloud.define("listUsers", function(request, response) {
       });
 });
 
+Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
+  console.log("inicio atualizaCaixasPontos");
+  var Apiario = Parse.Object.extend("Apiario");
+  var ApicultorAssociacao = Parse.Object.extend("ApicultorAssociacao");
+  var queryDelete = new Parse.Query(ApicultorAssociacao);
+  var map = {};
+  queryDelete.find().then(function(objects){
+	  console.log("retorno consulta atualizaCaixasPontos");
+	  //deleta os dados para recrialos
+	  return Parse.Object.destroyAll(objects);
+  }, function(err){
+	  response.error(error);
+  }).then(function(s){]
+	console.log("depois que deletou");
+	var queryApiarios = new Parse.Query(Apiario);
+	queryApiarios.find().then(function(results){
+		console.log("atualizaCaixasPontos " + results.length);
+		response.success("aee");
+	}, function(err){
+		console.log(err);
+		response.error(error);
+	});
+  });
+
+});  
