@@ -266,7 +266,7 @@ Parse.Cloud.define("notificaApicultor", function(request, response) {
 	//queryUser.equalTo('objectId', 'id');
 	var querySession = new Parse.Query(Parse.Session);
 	querySession.matchesQuery('user', queryUser);
-	query.find({ useMasterKey: true }).then(function(objects){
+	querySession.find({ useMasterKey: true }).then(function(objects){
 		console.log(objects);
 		var queryAndroid = new Parse.Query(Parse.Installation);
 		//queryAndroid.contains('instalationId', objects);
