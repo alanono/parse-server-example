@@ -261,7 +261,8 @@ Parse.Cloud.define("listUsers", function(request, response) {
 });
 
 Parse.Cloud.define("notificaUsuario", function(request, response) {
-
+	console.log('alan');
+	console.log(request.params);
 	var queryUser = new Parse.Query(Parse.User);
 	queryUser.equalTo('objectId', request.params.objectId);
 	var querySession = new Parse.Query(Parse.Session);
@@ -279,10 +280,11 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 		}, {
 			useMasterKey: true,
 		  success: function() {
-			// Push was successful
+			response.success('Cloud Code: Sucesso');
 		  },
 		  error: function(error) {
 			// Handle error
+			response.error(error);
 		  }
 		});
 	}, function(err){
@@ -303,7 +305,7 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
 	  //deleta os dados para recrialos
 	  return Parse.Object.destroyAll(objects);
   }, function(err){
-	  response.error(error);
+	  response.error(err);
   }).then(function(s){]
 	console.log("depois que deletou");
 	var queryApiarios = new Parse.Query(Apiario);
