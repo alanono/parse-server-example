@@ -263,6 +263,9 @@ Parse.Cloud.define("listUsers", function(request, response) {
 Parse.Cloud.define("notificaUsuario", function(request, response) {
 	console.log('alan');
 	console.log(request.params);
+	var log = request.log;
+	log.info("aaaa");
+	log.i("bbb");
 	var queryUser = new Parse.Query(Parse.User);
 	queryUser.equalTo('objectId', request.params.objectId);
 	var querySession = new Parse.Query(Parse.Session);
