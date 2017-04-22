@@ -267,7 +267,7 @@ Parse.Cloud.define("notificaApicultor", function(request, response) {
 
 	// Find devices associated with these users
 	var pushQuery = new Parse.Query(Parse.Installation);
-	pushQuery.matchesQuery('user', userQuery);
+	//pushQuery.matchesQuery('user', userQuery);
 console.log('aaa not');
 	// Send push notification to query
 	Parse.Push.send({
