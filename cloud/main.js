@@ -277,7 +277,7 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 		log.info(objects.length);
 		var listIns = [];
 		for (var i = 0; i < objects.length; ++i) {
-				sum += objects[i].get("installationId");
+				listIns.push(objects[i].get("installationId"));
 		}
 		var pushQuery = new Parse.Query(Parse.Installation);
 		//pushQuery.contains('installationId', listIns);
