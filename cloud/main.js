@@ -270,9 +270,14 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 	var querySession = new Parse.Query(Parse.Session);
 	querySession.matchesQuery('user', queryUser);
 	querySession.find({ useMasterKey: true }).then(function(objects){
-	log.info(objects);
+		log.info("installations");
+		log.info(objects);
+		var listIns = [];
+		for (var i = 0; i < objects.length; ++i) {
+				sum += objects[i].get("installationId");
+		}
 		var pushQuery = new Parse.Query(Parse.Installation);
-		//queryAndroid.contains('instalationId', objects);
+		//pushQuery.contains('installationId', listIns);
 		// Send push notification to query
 		Parse.Push.send({
 		  where: pushQuery,
