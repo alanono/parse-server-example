@@ -262,7 +262,7 @@ Parse.Cloud.define("listUsers", function(request, response) {
 
 Parse.Cloud.define("notificaApicultor", function(request, response) {
 
-	var userQuery = new Parse.Query("_User");
+	var userQuery = new Parse.Query(Parse.User);
 	//userQuery.withinMiles("location", stadiumLocation, 1.0);
 
 	// Find devices associated with these users
