@@ -280,7 +280,7 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 				listIns.push(objects[i].get("installationId"));
 		}
 		var pushQuery = new Parse.Query(Parse.Installation);
-		pushQuery.contains('installationId', listIns);
+		pushQuery.containedIn('installationId', listIns);
 		// Send push notification to query
 		Parse.Push.send({
 		  where: pushQuery,
