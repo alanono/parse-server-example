@@ -262,27 +262,31 @@ Parse.Cloud.define("listUsers", function(request, response) {
 
 Parse.Cloud.define("notificaApicultor", function(request, response) {
 
-	var userQuery = new Parse.Query(Parse.User);
-	//userQuery.withinMiles("location", stadiumLocation, 1.0);
-
-	// Find devices associated with these users
-	var pushQuery = new Parse.Query(Parse.Installation);
-	//pushQuery.matchesQuery('user', userQuery);
-console.log('aaa not');
-	// Send push notification to query
-	Parse.Push.send({
-	  where: pushQuery,
-	  data: {
-		alert: "Free hotdogs at the Parse concession stand!"
-	  }
-	}, {
-		useMasterKey: true,
-	  success: function() {
-		// Push was successful
-	  },
-	  error: function(error) {
-		// Handle error
-	  }
+	var queryUser = new Parse.Query(Parse.User);
+	//queryUser.equalTo('objectId', 'id');
+	var querySession = new Parse.Query(Parse.Session);
+	querySession.whereMatchQuery('user', queryUser);
+	query.find({ useMasterKey: true }).then(function(objects){
+		console.log(objects);
+		var queryAndroid = new Parse.Query(Parse.Installation);
+		//queryAndroid.contains('instalationId', objects);
+		// Send push notification to query
+		Parse.Push.send({
+		  where: pushQuery,
+		  data: {
+			alert: "Free hotdogs at the Parse concession stand!"
+		  }
+		}, {
+			useMasterKey: true,
+		  success: function() {
+			// Push was successful
+		  },
+		  error: function(error) {
+			// Handle error
+		  }
+		});
+	}, function(err){
+		console.log(err);
 	});
 });
 
