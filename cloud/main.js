@@ -260,10 +260,10 @@ Parse.Cloud.define("listUsers", function(request, response) {
       });
 });
 
-Parse.Cloud.define("notificaApicultor", function(request, response) {
+Parse.Cloud.define("notificaUsuario", function(request, response) {
 
 	var queryUser = new Parse.Query(Parse.User);
-	//queryUser.equalTo('objectId', 'id');
+	queryUser.equalTo('objectId', request.params.objectId);
 	var querySession = new Parse.Query(Parse.Session);
 	querySession.matchesQuery('user', queryUser);
 	querySession.find({ useMasterKey: true }).then(function(objects){
@@ -274,7 +274,7 @@ Parse.Cloud.define("notificaApicultor", function(request, response) {
 		Parse.Push.send({
 		  where: pushQuery,
 		  data: {
-			alert: "Free hotdogs at the Parse concession stand!"
+			alert: request.params.msg
 		  }
 		}, {
 			useMasterKey: true,
