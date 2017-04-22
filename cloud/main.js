@@ -259,6 +259,33 @@ Parse.Cloud.define("listUsers", function(request, response) {
         response.error(error);
       });
 });
+
+Parse.Cloud.define("notificaApicultor", function(request, response) {
+
+	var userQuery = new Parse.Query(Parse.User);
+	//userQuery.withinMiles("location", stadiumLocation, 1.0);
+
+	// Find devices associated with these users
+	var pushQuery = new Parse.Query(Parse.Installation);
+	pushQuery.matchesQuery('user', userQuery);
+console.log('aaa not');
+	// Send push notification to query
+	Parse.Push.send({
+	  where: pushQuery,
+	  data: {
+		alert: "Free hotdogs at the Parse concession stand!"
+	  }
+	}, {
+	  success: function() {
+		// Push was successful
+	  },
+	  error: function(error) {
+		// Handle error
+	  }
+	});
+});
+
+
 /*
 Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
   console.log("inicio atualizaCaixasPontos");
