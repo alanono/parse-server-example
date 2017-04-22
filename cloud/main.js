@@ -262,7 +262,7 @@ Parse.Cloud.define("listUsers", function(request, response) {
 
 Parse.Cloud.define("notificaApicultor", function(request, response) {
 
-	var userQuery = new Parse.Query(Parse.User);
+	var userQuery = new Parse.Query("_User");
 	//userQuery.withinMiles("location", stadiumLocation, 1.0);
 
 	// Find devices associated with these users
@@ -276,6 +276,7 @@ console.log('aaa not');
 		alert: "Free hotdogs at the Parse concession stand!"
 	  }
 	}, {
+		useMasterKey: true,
 	  success: function() {
 		// Push was successful
 	  },
