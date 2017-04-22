@@ -265,13 +265,16 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 	console.log('alan');
 	log.info(request.params);
 	log.info("aaaa");
-	var queryUser = new Parse.Query("_User");
+	var User = Parse.Object.extend("_User");
+	var Session = Parse.Object.extend("_Session");
+	var queryUser = new Parse.Query(User);
 	queryUser.equalTo('objectId', request.params.objectId);
-	var querySession = new Parse.Query(Parse.Session);
+	var querySession = new Parse.Query(Session);
 	querySession.matchesQuery('user', queryUser);
 	querySession.find({ useMasterKey: true }).then(function(objects){
 		log.info("installations");
 		log.info(objects);
+		log.info(objects.length);
 		var listIns = [];
 		for (var i = 0; i < objects.length; ++i) {
 				sum += objects[i].get("installationId");
