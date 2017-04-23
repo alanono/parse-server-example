@@ -332,13 +332,14 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
 			apicAssoc.increment("qtdPontos");
 		}
 		log.info("hmmaa");
-		return Parse.Object.saveAll(Object.values(map){
+		return Parse.Object.saveAll(Object.values(map), {
 			success: function(list) {
 				response.success("aee");
 			},
 			error: function(error) {
 			  response.error(error);
-			});
+			}
+		});
 		
 	}, function(err){
 		console.log(err);
