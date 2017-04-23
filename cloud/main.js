@@ -315,6 +315,7 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
   }).then(function(s){
 	log.info("depois que deletou");
 	var queryApiarios = new Parse.Query(Apiario);
+	queryApiarios.include("apicultor").include("associacao");
 	queryApiarios.find().then(function(results){
 		log.info("atualizaCaixasPontos " + results.length);
 		for (var i = 0; i < results.length; ++i) {
