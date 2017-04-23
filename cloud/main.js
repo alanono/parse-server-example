@@ -272,7 +272,7 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 		log.info("installations: " + objects.length);
 		var listIns = [];
 		for (var i = 0; i < objects.length; ++i) {
-				listIns.push(objects[i].get("installationId"));
+			listIns.push(objects[i].get("installationId"));
 		}
 		var pushQuery = new Parse.Query(Parse.Installation);
 		pushQuery.containedIn('installationId', listIns);
@@ -317,7 +317,29 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
 	var queryApiarios = new Parse.Query(Apiario);
 	queryApiarios.find().then(function(results){
 		log.info("atualizaCaixasPontos " + results.length);
-		response.success("aee");
+		for (var i = 0; i < results.length; ++i) {
+			var apicAssoc;
+			var key = results[i].get("apicultor").get("objectId") + '-' + results[i].get("associacao").get("objectId");
+			if(map[key]){
+				apicAssoc = map[key];
+			} else {
+				apicAssoc = new ApicultorAssociacao();
+				apicAssoc.set("apicultor", results[i].get("apicultor"));
+				apicAssoc.set("associacao", results[i].get("associacao"));
+				map[key] = apicAssoc;
+			}
+			apicAssoc.increment("qtdCaixas", results[i].get("qtdCaixas"));
+			apicAssoc.increment("qtdPontos");
+		}
+		log.info("hmmaa");
+		return Parse.Object.saveAll(Object.values(map){
+			success: function(list) {
+				response.success("aee");
+			},
+			error: function(error) {
+			  response.error(error);
+			});
+		
 	}, function(err){
 		console.log(err);
 		response.error(error);
