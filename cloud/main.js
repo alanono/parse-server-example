@@ -320,9 +320,9 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
 	queryApiarios.find().then(function(results){
 		log.info("atualizaCaixasPontos " + results.length);
 		for (var i = 0; i < results.length; ++i) {
+			if(!results[i].get("apicultor") || !results[i].get("associacao"))
+				continue;
 			var apicAssoc;
-			log.info(results[i].get("apicultor"));
-			log.info(results[i].get("apicultor").id);
 			var key = results[i].get("apicultor").id + '-' + results[i].get("associacao").id;
 			log.info("key:"+key);
 			if(map[key]){
@@ -333,7 +333,7 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
 				apicAssoc.set("associacao", results[i].get("associacao"));
 				map[key] = apicAssoc;
 			}
-			apicAssoc.increment("qtdCaixas", results[i].get("qtdCaixas"));
+			apicAssoc.increment("qtdCaixas", results[i].get("qtdCaixas") || 0);
 			apicAssoc.increment("qtdPontos");
 		}
 		log.info("hmmaa");
