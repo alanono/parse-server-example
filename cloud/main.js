@@ -321,8 +321,8 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
 		for (var i = 0; i < results.length; ++i) {
 			var apicAssoc;
 			log.info(results[i].get("apicultor"));
-			log.info(results[i].get("apicultor").objectId);
-			var key = results[i].get("apicultor").get("objectId") + '-' + results[i].get("associacao").get("objectId");
+			log.info(results[i].get("apicultor").id);
+			var key = results[i].get("apicultor").id + '-' + results[i].get("associacao").id;
 			log.info("key:"+key);
 			if(map[key]){
 				apicAssoc = map[key];
