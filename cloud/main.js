@@ -318,7 +318,7 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
 	//queryApiarios.equalTo('valido', true).equalTo('ativo', true).notEqualTo('excluded', true);
 	queryApiarios.include("apicultor").include("associacao").limit(1000);
 	queryApiarios.find().then(function(results){
-		log.info("atualizaCaixasPontos " + results.length);
+		log.info("qtd apiarios: " + results.length);
 		for (var i = 0; i < results.length; ++i) {
 			if(!results[i].get("apicultor") || !results[i].get("associacao"))
 				continue;
@@ -336,10 +336,10 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
 			apicAssoc.increment("qtdCaixas", results[i].get("qtdCaixas") || 0);
 			apicAssoc.increment("qtdPontos");
 		}
-		log.info("hmmaa");
+		log.info("antes do saveAll");
 		return Parse.Object.saveAll(Object.values(map), {
 			success: function(list) {
-				response.success("aee");
+				response.success("Sucesso");
 			},
 			error: function(error) {
 			  response.error(error);
