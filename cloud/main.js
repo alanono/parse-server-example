@@ -299,9 +299,10 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 
 
 
-Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
+Parse.Cloud.job("atualizaCaixasPontos", function(request, response) {
   var log = request.log;
   log.info("inicio atualizaCaixasPontos");
+  status.message("Rodando");
   var Apiario = Parse.Object.extend("Apiario");
   var ApicultorAssociacao = Parse.Object.extend("ApicultorAssociacao");
   var queryDelete = new Parse.Query(ApicultorAssociacao);
@@ -315,7 +316,8 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
   }).then(function(s){
 	log.info("depois que deletou");
 	var queryApiarios = new Parse.Query(Apiario);
-	queryApiarios.include("apicultor").include("associacao");
+	//queryApiarios.equalTo('valido', true).equalTo('ativo', true).notEqualTo('excluded', true);
+	queryApiarios.include("apicultor").include("associacao").limit(1000);
 	queryApiarios.find().then(function(results){
 		log.info("atualizaCaixasPontos " + results.length);
 		for (var i = 0; i < results.length; ++i) {
@@ -338,16 +340,17 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
 		log.info("hmmaa");
 		return Parse.Object.saveAll(Object.values(map), {
 			success: function(list) {
-				response.success("aee");
+				status.success("Sucesso");
 			},
 			error: function(error) {
-			  response.error(error);
+			  log.error(error);
+			  status.success("Erro");
 			}
 		});
 		
 	}, function(err){
-		console.log(err);
-		response.error(error);
+		  log.error(error);
+		  status.success("Erro");
 	});
   });
 
