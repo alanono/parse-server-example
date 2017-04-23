@@ -262,9 +262,6 @@ Parse.Cloud.define("listUsers", function(request, response) {
 
 Parse.Cloud.define("notificaUsuario", function(request, response) {
 	var log = request.log;
-	console.log('alan');
-	log.info(request.params);
-	log.info("aaaa");
 	var User = Parse.Object.extend("_User");
 	var Session = Parse.Object.extend("_Session");
 	var queryUser = new Parse.Query(User);
@@ -272,9 +269,7 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 	var querySession = new Parse.Query(Session);
 	querySession.matchesQuery('user', queryUser);
 	querySession.find({ useMasterKey: true }).then(function(objects){
-		log.info("installations");
-		log.info(objects);
-		log.info(objects.length);
+		log.info("installations: " + objects.length);
 		var listIns = [];
 		for (var i = 0; i < objects.length; ++i) {
 				listIns.push(objects[i].get("installationId"));
@@ -290,7 +285,7 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 		}, {
 			useMasterKey: true,
 		  success: function() {
-			response.success('Cloud Code: Sucesso');
+			response.success('Enviados: ' + objects.length);
 		  },
 		  error: function(error) {
 			// Handle error
@@ -303,24 +298,25 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 });
 
 
-/*
+
 Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
-  console.log("inicio atualizaCaixasPontos");
+  var log = request.log;
+  log.info("inicio atualizaCaixasPontos");
   var Apiario = Parse.Object.extend("Apiario");
   var ApicultorAssociacao = Parse.Object.extend("ApicultorAssociacao");
   var queryDelete = new Parse.Query(ApicultorAssociacao);
   var map = {};
   queryDelete.find().then(function(objects){
-	  console.log("retorno consulta atualizaCaixasPontos");
+	  log.info("retorno consulta atualizaCaixasPontos");
 	  //deleta os dados para recrialos
 	  return Parse.Object.destroyAll(objects);
   }, function(err){
 	  response.error(err);
-  }).then(function(s){]
-	console.log("depois que deletou");
+  }).then(function(s){
+	log.info("depois que deletou");
 	var queryApiarios = new Parse.Query(Apiario);
 	queryApiarios.find().then(function(results){
-		console.log("atualizaCaixasPontos " + results.length);
+		log.info("atualizaCaixasPontos " + results.length);
 		response.success("aee");
 	}, function(err){
 		console.log(err);
@@ -329,4 +325,3 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
   });
 
 });  
-*/
