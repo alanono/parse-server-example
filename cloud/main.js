@@ -299,10 +299,9 @@ Parse.Cloud.define("notificaUsuario", function(request, response) {
 
 
 
-Parse.Cloud.job("atualizaCaixasPontos", function(request, response) {
+Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
   var log = request.log;
   log.info("inicio atualizaCaixasPontos");
-  status.message("Rodando");
   var Apiario = Parse.Object.extend("Apiario");
   var ApicultorAssociacao = Parse.Object.extend("ApicultorAssociacao");
   var queryDelete = new Parse.Query(ApicultorAssociacao);
@@ -340,17 +339,16 @@ Parse.Cloud.job("atualizaCaixasPontos", function(request, response) {
 		log.info("hmmaa");
 		return Parse.Object.saveAll(Object.values(map), {
 			success: function(list) {
-				status.success("Sucesso");
+				response.success("aee");
 			},
 			error: function(error) {
-			  log.error(error);
-			  status.success("Erro");
+			  response.error(error);
 			}
 		});
 		
 	}, function(err){
-		  log.error(error);
-		  status.success("Erro");
+		console.log(err);
+		response.error(error);
 	});
   });
 
