@@ -1,8 +1,9 @@
 //var fs = require('fs');
 //var CityLocation = require('./js_lib/citylocation.js');
 
-Parse.Cloud.define('syncCity', function(req, res) {
+Parse.Cloud.define('syncCity', function(request, response) {
   response.success("Hello world!");
+  
 });
 
 // Use Parse.Cloud.define to define as many cloud functions as you want.
