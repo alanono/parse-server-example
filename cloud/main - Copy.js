@@ -1,9 +1,8 @@
 //var fs = require('fs');
 //var CityLocation = require('./js_lib/citylocation.js');
 
-Parse.Cloud.define('syncCity', function(request, response) {
+Parse.Cloud.define('syncCity', function(req, res) {
   response.success("Hello world!");
-  
 });
 
 // Use Parse.Cloud.define to define as many cloud functions as you want.
@@ -354,26 +353,3 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
   });
 
 });  
-
-Parse.Cloud.define("listUsers", function(request, response) {
-   var Query = Parse.Object.extend("_User");
-   var query = new Parse.Query(Query);
-   
-   if(request.params.noInclude)
-	query.include("apicultor").include("associacao"); 
-
-   if(request.params.limit)
-	 query.limit(request.params.limit);
-   else
-	 query.limit(1000);
-
-   if(request.params.skip)
-	  query.skip(request.params.skip);
-   
-   query.find({ useMasterKey: true }).then(function(objects) {
-        console.log(objects);
-		response.success(objects);
-      }, function(error) {
-        response.error(error);
-      });
-});
