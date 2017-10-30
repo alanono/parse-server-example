@@ -1,9 +1,13 @@
-//var fs = require('fs');
-//var CityLocation = require('./js_lib/citylocation.js');
+var fs = require('fs');
+;;var CityLocation = require('./js_lib/citylocation.js');
 
 Parse.Cloud.define('syncCity', function(request, response) {
-  response.success("Hello world!");
-  
+  try{
+	  ;;queryMuncipios(request);
+	  response.success("OK");	  
+  } catch(err){
+	response.error(err);
+  } 
 });
 
 // Use Parse.Cloud.define to define as many cloud functions as you want.
@@ -12,42 +16,13 @@ Parse.Cloud.define("hello", function(request, response) {
   response.success("Hello world!");
 });
 
-Parse.Cloud.beforeSave("Associacao", function(request, response) {
-	
-  if (request.object.get("numeroSif") != undefined && request.object.get("objectId") != undefined) {
-	var numeroSif  =  request.object.get("numeroSif");
-	var objectId = request.object.id;
-	
-	
-	var Associacao = Parse.Object.extend("Associacao");
-	var query = new Parse.Query(Associacao);
-	query.get(objectId, {
-	  success: function(associacao) {
-		var numeroSifNovo = associacao.get('numeroSif')
-		console.log('objectId = '+objectId);
-		console.log('object = '+associacao);
-		console.log('numero sif antigo = '+numeroSif);
-		console.log('numero sif novo = '+numeroSifNovo);
-		if(numeroSifNovo != numeroSif){
-			request.object.set("tipoRegistro",1);
-			request.object.set("registro",numeroSif);
-		}
-		response.success();
-	  },
-	  error: function(object, error) {
-		response.error("Objeto nao encontrado");
-	  }
-	});
-  } else {
-	  response.success();
-  }
-});
 
 //http://stackoverflow.com/questions/32914945/how-to-query-objects-in-the-cloudcode-beforesave
 Parse.Cloud.beforeSave("Apiario", function(request, response) {
+  var log = request.log;
   var apiario = request.object;
   var storeJSON = apiario.toJSON();
-  console.log("apiario ID " + apiario.id + "qtdCaixas" + apiario.get("qtdCaixas"));
+  log.info("apiario ID " + apiario.id + "qtdCaixas" + apiario.get("qtdCaixas"));
   
   if(apiario.id){
 	  var ApiarioClass = Parse.Object.extend("Apiario");
@@ -56,7 +31,7 @@ Parse.Cloud.beforeSave("Apiario", function(request, response) {
 	  apiarioOld.set("objectId", apiario.id);
 	  apiarioOld.fetch({
 		success: function(apiarioOld) {
-			console.log("apiario ID " + apiario.id + "qtdCaixasApiario" + apiario.get("qtdCaixas"));
+			log.info("apiario ID " + apiario.id + "qtdCaixasApiario" + apiario.get("qtdCaixas"));
 			var historicoApiario = new Parse.Object("HistoricoApiario");
 
 			historicoApiario.set("apiario", apiarioOld);
@@ -65,6 +40,7 @@ Parse.Cloud.beforeSave("Apiario", function(request, response) {
 			historicoApiario.set("qtdCaixas", apiarioOld.get("qtdCaixas"));
 			console.log(apiarioOld.get("qtdCaixas")+"qtdCaixasOld");
 			historicoApiario.set("dialogoVizinhos", apiarioOld.get("dialogoVizinhos"));
+			historicoApiario.set("distanciaDeslocamentoCaixas", apiarioOld.get("distanciaDeslocamentoCaixas"));
 			historicoApiario.set("existenciaMortalidadeAbelha", apiarioOld.get("existenciaMortalidadeAbelha"));
 			historicoApiario.set("exameColmeiaDoenca", apiarioOld.get("exameColmeiaDoenca"));
 			historicoApiario.set("historicoMortandade", apiarioOld.get("historicoMortandade"));
@@ -82,16 +58,19 @@ Parse.Cloud.beforeSave("Apiario", function(request, response) {
 			historicoApiario.set("ativo", apiarioOld.get("ativo"));
 			historicoApiario.set("nomesArquivos", apiarioOld.get("nomesArquivos"));
 			historicoApiario.set("uuid", apiarioOld.get("uuid"));
+			historicoApiario.set("associacao", apiarioOld.get("associacao"));
+			historicoApiario.set("excluded", apiarioOld.get("excluded"));
+			historicoApiario.set("modificadoPor", request.user);
 
 			historicoApiario.save();
 
-			console.log(storeJSON+" ");
+			log.debug(storeJSON+" ");
 			// Recreating Apiario
             for ( key in storeJSON ) {
                 apiario.set( key, storeJSON[key]);
             }			
 			
-			console.log("apiario ID " + apiario.id + "qtdCaixasApiario" + apiario.get("qtdCaixas"));
+			log.info("apiario ID " + apiario.id + "qtdCaixasApiario" + apiario.get("qtdCaixas"));
 			response.success();
 		},
 		error: function(apiarioOld, error) {
@@ -112,7 +91,7 @@ Parse.Cloud.beforeSave("Apiario", function(request, response) {
 function queryMuncipios(res){
   var ParseMunicipio_Object = Parse.Object.extend("Municipio");
   var query = new Parse.Query(ParseMunicipio_Object);
-  query.limit(1000).skip(0).find().then(function(results){
+  query.limit(6000).skip(0).find().then(function(results){
       municipios = results;
       searchApiarios(res);
   });
@@ -124,7 +103,6 @@ function searchApiarios(res){
 
  queryObjectApiario.equalTo("municipio", null);
  queryObjectApiario.limit(1000).skip(0).include("municipio").find().then(function(results){
-	  
     var apiariosToSave = [];
 	  for(var index in results){
 		  var apiario = results[index];
@@ -195,30 +173,6 @@ function searchCityByCodigo(codigo){
   return null;
 }
 
-/*Foi alterada para updateUser, sera mantida temporariamente por motivos de compatibilidade*/
-Parse.Cloud.define("updateUserPass", function(request, response) {
-   var Query = Parse.Object.extend("_User");
-   var query = new Parse.Query(Query);   
-   query.equalTo("objectId", request.params.objectId);
-   query.first({ useMasterKey: true }).then(function(object) {
-        console.log(object);
-		object.set("username", request.params.username);
-        if(request.params.password)
-			object.set("password", request.params.password);
-		object.save(null,{
-          useMasterKey: true,
-          success: function(note){
-            //u should wait the non-blocking call success and finish
-            console.log("usuario atualizado ", object);
-            response.success('Cloud Code: Usuario atualizado');
-          }, error: response.error
-        });
-		
-		response.success(object);
-      }, function(error) {
-        response.error(error);
-      });
-});
 
 Parse.Cloud.define("updateUser", function(request, response) {
    var Query = Parse.Object.extend("_User");
@@ -234,6 +188,10 @@ Parse.Cloud.define("updateUser", function(request, response) {
 			object.set("email", request.params.email);
         if(request.params.tipo)
 			object.set("tipo", request.params.tipo);
+        if(request.params.nomeGestor)
+			object.set("nomeGestor", request.params.nomeGestor);
+			  if(request.params.excluded)
+			object.set("excluded", request.params.excluded);
 		object.save(null,{
           useMasterKey: true,
           success: function(note){
@@ -252,7 +210,18 @@ Parse.Cloud.define("updateUser", function(request, response) {
 Parse.Cloud.define("listUsers", function(request, response) {
    var Query = Parse.Object.extend("_User");
    var query = new Parse.Query(Query);
-   query.include("apicultor").include("associacao");   
+   
+   if(request.params.noInclude)
+	query.include("apicultor").include("associacao"); 
+
+   if(request.params.limit)
+	 query.limit(parseInt(request.params.limit));
+   else
+	 query.limit(1000);
+
+   if(request.params.skip)
+	  query.skip(request.params.skip);
+   
    query.find({ useMasterKey: true }).then(function(objects) {
         console.log(objects);
 		response.success(objects);
@@ -355,25 +324,202 @@ Parse.Cloud.define("atualizaCaixasPontos", function(request, response) {
 
 });  
 
-Parse.Cloud.define("listUsers", function(request, response) {
-   var Query = Parse.Object.extend("_User");
-   var query = new Parse.Query(Query);
-   
-   if(request.params.noInclude)
-	query.include("apicultor").include("associacao"); 
 
-   if(request.params.limit)
-	 query.limit(request.params.limit);
-   else
-	 query.limit(1000);
+Parse.Cloud.beforeSave("Associacao", function(request, response) {
+  var log = request.log;
+  var associacao = request.object;
+  var storeJSON = associacao.toJSON();
+  log.info("associacao ID " + associacao.id);
+  
+  if(associacao.id){
+	  var AssociacaoClass = Parse.Object.extend("Associacao");
+	  var associacaoOld = new AssociacaoClass();
+	  
+	  associacaoOld.set("objectId", associacao.id);
+	  associacaoOld.fetch({
+		success: function(associacaoOld) {
+			log.info("associacao ID " + associacao.id);
+			var historicoAssociacao = new Parse.Object("HistoricoAssociacao");
 
-   if(request.params.skip)
-	  query.skip(request.params.skip);
-   
-   query.find({ useMasterKey: true }).then(function(objects) {
-        console.log(objects);
-		response.success(objects);
-      }, function(error) {
-        response.error(error);
-      });
-});
+			historicoAssociacao.set("associacao", associacaoOld);
+			historicoAssociacao.set("bairro", associacaoOld.get("bairro"));
+			historicoAssociacao.set("sigla", associacaoOld.get("sigla"));
+			historicoAssociacao.set("tipoRegistro", associacaoOld.get("tipoRegistro"));
+			historicoAssociacao.set("nome", associacaoOld.get("nome"));
+			historicoAssociacao.set("numeroSif", associacaoOld.get("numeroSif"));
+			historicoAssociacao.set("registro", associacaoOld.get("registro"));
+			historicoAssociacao.set("endereco", associacaoOld.get("endereco"));
+			historicoAssociacao.set("telefone", associacaoOld.get("telefone"));
+			historicoAssociacao.set("contatoPresidenteNome", associacaoOld.get("contatoPresidenteNome"));
+			historicoAssociacao.set("contatoPresidenteTelefone", associacaoOld.get("contatoPresidenteTelefone"));
+			historicoAssociacao.set("uuid", associacaoOld.get("uuid"));
+			historicoAssociacao.set("municipio", associacaoOld.get("municipio"));
+			historicoAssociacao.set("email", associacaoOld.get("email"));
+			historicoAssociacao.set("cep", associacaoOld.get("cep"));
+			historicoAssociacao.set("excluded", associacaoOld.get("excluded"));
+			historicoAssociacao.set("modificadoPor", request.user);
+
+			historicoAssociacao.save();
+
+			log.debug(storeJSON+" ");
+			// Recreating Associacao
+            for ( key in storeJSON ) {
+                associacao.set( key, storeJSON[key]);
+            }			
+			
+			log.info("associacao ID " + associacao.id);
+			response.success();
+		},
+		error: function(associacaoOld, error) {
+		  response.error("Got an error " + error.code + " : " + error.message);
+		}
+	  });
+  }
+  else{
+	  console.log("Nova associacao");
+	  response.success();
+  }
+});  
+
+
+Parse.Cloud.beforeSave("Propriedade", function(request, response) {
+  var log = request.log;
+  var propriedade = request.object;
+  var storeJSON = propriedade.toJSON();
+  log.info("propriedade ID " + propriedade.id);
+  
+  if(propriedade.id){
+	  var PropriedadeClass = Parse.Object.extend("Propriedade");
+	  var propriedadeOld = new PropriedadeClass();
+	  
+	  propriedadeOld.set("objectId", propriedade.id);
+	  propriedadeOld.fetch({
+		success: function(propriedadeOld) {
+			log.info("propriedade ID " + propriedade.id);
+			var historicoPropriedade = new Parse.Object("HistoricoPropriedade");
+
+			historicoPropriedade.set("propriedade", propriedadeOld);
+			historicoPropriedade.set("nome", propriedadeOld.get("nome"));
+			historicoPropriedade.set("rotaAcesso", propriedadeOld.get("rotaAcesso"));
+			historicoPropriedade.set("municipio", propriedadeOld.get("municipio"));
+			historicoPropriedade.set("uuid", propriedadeOld.get("uuid"));
+			historicoPropriedade.set("excluded", propriedadeOld.get("excluded"));
+			historicoPropriedade.set("apicultores", propriedadeOld.get("apicultores"));
+			historicoPropriedade.set("modificadoPor", request.user);
+			
+			historicoPropriedade.save();
+
+			log.debug(storeJSON+" ");
+            for ( key in storeJSON ) {
+                propriedade.set( key, storeJSON[key]);
+            }			
+			
+			log.info("propriedade ID " + propriedade.id);
+			response.success();
+		},
+		error: function(propriedadeOld, error) {
+		  response.error("Got an error " + error.code + " : " + error.message);
+		}
+	  });
+  }
+  else{
+	  console.log("Nova propriedade");
+	  response.success();
+  }
+});  
+
+
+Parse.Cloud.beforeSave("Apicultor", function(request, response) {
+  var log = request.log;
+  var apicultor = request.object;
+  var storeJSON = apicultor.toJSON();
+  log.info("apicultor ID " + apicultor.id);
+  
+  if(apicultor.id){
+	  var ApicultorClass = Parse.Object.extend("Apicultor");
+	  var apicultorOld = new ApicultorClass();
+	  
+	  apicultorOld.set("objectId", apicultor.id);
+	  apicultorOld.fetch({
+		success: function(apicultorOld) {
+			log.info("apicultor ID " + apicultor.id);
+			var historicoApicultor = new Parse.Object("HistoricoApicultor");
+
+			historicoApicultor.set("apicultor", apicultorOld);
+			historicoApicultor.set("nome", apicultorOld.get("nome"));
+			historicoApicultor.set("endereco", apicultorOld.get("endereco"));
+			historicoApicultor.set("telefone", apicultorOld.get("telefone"));
+			historicoApicultor.set("celular", apicultorOld.get("celular"));
+			historicoApicultor.set("email", apicultorOld.get("email"));
+			historicoApicultor.set("registroSif", apicultorOld.get("registroSif"));
+			historicoApicultor.set("uuid", apicultorOld.get("uuid"));
+			historicoApicultor.set("cpf", apicultorOld.get("cpf"));
+			historicoApicultor.set("municipio", apicultorOld.get("municipio"));
+			historicoApicultor.set("apicultorAssociacao", apicultorOld.get("apicultorAssociacao"));
+			historicoApicultor.set("excluded", apicultorOld.get("excluded"));
+			historicoApicultor.set("modificadoPor", request.user);
+			
+			historicoApicultor.save();
+
+			log.debug(storeJSON+" ");
+            for ( key in storeJSON ) {
+                apicultor.set( key, storeJSON[key]);
+            }			
+			
+			log.info("apicultor ID " + apicultor.id);
+			response.success();
+		},
+		error: function(apicultorOld, error) {
+		  response.error("Got an error " + error.code + " : " + error.message);
+		}
+	  });
+  }
+  else{
+	  console.log("Novo apicultor");
+	  response.success();
+  }
+});  
+
+
+Parse.Cloud.beforeSave("ApicultorAssociacao", function(request, response) {
+  var log = request.log;
+  var apicultorAssociacao = request.object;
+  var storeJSON = apicultorAssociacao.toJSON();
+  log.info("apicultorAssociacao ID " + apicultorAssociacao.id);
+  
+  if(apicultorAssociacao.id){
+	  var ApicultorClass = Parse.Object.extend("ApicultorAssociacao");
+	  var apicultorAssociacaoOld = new ApicultorClass();
+	  
+	  apicultorAssociacaoOld.set("objectId", apicultorAssociacao.id);
+	  apicultorAssociacaoOld.fetch({
+		success: function(apicultorAssociacaoOld) {
+			log.info("apicultorAssociacao ID " + apicultorAssociacao.id);
+			var historicoApicultorAssociacao = new Parse.Object("HistoricoApicultorAssociacao");
+
+			historicoApicultorAssociacao.set("apicultorAssociacao", apicultorAssociacaoOld);
+			historicoApicultorAssociacao.set("uuid", apicultorAssociacaoOld.get("uuid"));
+			historicoApicultorAssociacao.set("associacao", apicultorAssociacaoOld.get("associacao"));
+			historicoApicultorAssociacao.set("qtdPontos", apicultorAssociacaoOld.get("qtdPontos"));
+			historicoApicultorAssociacao.set("qtdCaixas", apicultorAssociacaoOld.get("qtdCaixas"));
+
+			historicoApicultorAssociacao.save();
+
+			log.debug(storeJSON+" ");
+            for ( key in storeJSON ) {
+                apicultorAssociacao.set( key, storeJSON[key]);
+            }			
+			
+			log.info("apicultorAssociacao ID " + apicultorAssociacao.id);
+			response.success();
+		},
+		error: function(apicultorAssociacaoOld, error) {
+		  response.error("Got an error " + error.code + " : " + error.message);
+		}
+	  });
+  }
+  else{
+	  console.log("Novo apicultorAssociacao");
+	  response.success();
+  }
+});  
