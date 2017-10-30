@@ -1,9 +1,9 @@
 var fs = require('fs');
-;;var CityLocation = require('./js_lib/citylocation.js');
+//var CityLocation = require('./js_lib/citylocation.js');
 
 Parse.Cloud.define('syncCity', function(request, response) {
   try{
-	  ;;queryMuncipios(request);
+	  //queryMuncipios(request);
 	  response.success("OK");	  
   } catch(err){
 	response.error(err);
